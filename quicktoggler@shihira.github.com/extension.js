@@ -20,6 +20,9 @@ const Core = Me.imports.core;
 const Convenience = Me.imports.convenience;
 const Prefs = Me.imports.prefs;
 
+const Gettext = imports.gettext.domain("gnome-extension-quicktoggler");
+const _ = Gettext.gettext;
+
 const LOGGER_INFO = 0;
 const LOGGER_WARNING = 1;
 const LOGGER_ERROR = 2;
@@ -113,7 +116,7 @@ const SearchBox = new Lang.Class({
     _init: function() {
         this.actor = new St.BoxLayout({ style_class: 'search-box' });
         this.search = new St.Entry({
-                hint_text: "Filter",
+                hint_text: _("Filter"),
                 x_expand: true,
                 y_expand: true,
         });
@@ -197,12 +200,22 @@ const TogglerIndicator = new Lang.Class({
         this.search_mode = false;
     },
 
+    get_layout: function() {
+        if(!this._layout) {
+            this._layout = new St.BoxLayout();
+            this.actor.add_actor(this._layout);
+        }
+        return this._layout;
+    },
+
     _loadSettings: function() {
         this._settings = new Convenience.getSettings();
 
         this._loadLogger(); // load first
         this._loadIcon();
+        this._loadText();
         this._loadConfig();
+        this._loadSearchBar();
         this._loadPulser();
         this._loadShortcut();
 
@@ -211,10 +224,12 @@ const TogglerIndicator = new Lang.Class({
             loaders[Prefs.LOG_FILE]             = "_loadLogger";
             loaders[Prefs.NOTIFICATION_COND]    = "_loadLogger";
             loaders[Prefs.INDICATOR_ICON]       = "_loadIcon";
+            loaders[Prefs.INDICATOR_TEXT]       = "_loadText";
             loaders[Prefs.ENTRIES_FILE]         = "_loadConfig";
             loaders[Prefs.DETECTION_INTERVAL]   = "_loadPulser";
 
-            if(loaders[key]) this[loaders[key]]();
+            if(loaders[key])
+                this[loaders[key]]();
         }));
     },
 
@@ -233,10 +248,31 @@ const TogglerIndicator = new Lang.Class({
                 icon_name: icon_name,
                 style_class: 'system-status-icon'
             });
-            this.actor.add_actor(this._icon);
+            this.get_layout().add_child(this._icon);
         } else {
             this._icon.set_icon_name(icon_name);
         }
+    },
+
+    _loadText: function() {
+        let text = this._settings.get_string(Prefs.INDICATOR_TEXT);
+
+        if(!this._text) {
+            this._text = new St.Label({
+                y_align: Clutter.ActorAlign.CENTER,
+            });
+
+            this._text.set_y_expand(true);
+            this._text.clutter_text.set_use_markup(true);
+            this.get_layout().add_child(this._text);
+        }
+
+        if(this._text.clutter_text && this._text.clutter_text.set_markup)
+            this._text.clutter_text.set_markup(text);
+        else if(this._text.clutter_text && this._text.clutter_text.set_text)
+            this._text.clutter_text.set_text(text);
+        else
+            getLogger().error("Cannot set indicator string.");
     },
 
     _loadConfig: function() {
@@ -244,17 +280,35 @@ const TogglerIndicator = new Lang.Class({
             // automatically create configuration file when path is invalid
             let entries_file = this._settings.get_string(Prefs.ENTRIES_FILE);
             entries_file = entries_file || GLib.get_home_dir() + "/.entries.json";
-            let fileobj = Gio.File.new_for_path(entries_file);
-            if(!fileobj.query_exists(null)) {
-                let orgf = Gio.File.new_for_path((Me.path + "/entries.json"));
-                orgf.copy(fileobj, 0, null, null);
+
+            let success = false;
+            // retry as most 10 times
+            for(let i = 0; i < 10 && ! success; i++) {
+                if(!this.entries_file || this.entries_file != entries_file) {
+                    let fileobj = Gio.File.new_for_path(entries_file);
+                    if(!fileobj.query_exists(null)) {
+                        let orgf = Gio.File.new_for_path((Me.path + "/entries.json"));
+                        orgf.copy(fileobj, 0, null, null);
+                    }
+
+                    let fileinfo = fileobj.query_info("*", Gio.FileQueryInfoFlags.NONE, null);
+                    if(fileinfo.get_is_symlink()) {
+                        entries_file = fileinfo.get_symlink_target();
+                        continue;
+                    }
+
+                    getLogger().warning("Reloading " + entries_file);
+
+                    let monitor = fileobj.monitor(Gio.FileMonitorFlags.NONE, null);
+                    monitor.connect('changed', Lang.bind(this, this._loadConfig));
+                    this.monitor = monitor;
+                    this.entries_file = entries_file;
+
+                    success = true;
+                }
             }
 
-            // replace old monitor if it exists
-            let monitor = fileobj.monitor(Gio.FileMonitorFlags.NONE, null);
-            if(typeof(this.monitor) == typeof(monitor)) this.monitor.unref();
-            this.monitor = monitor;
-            this.monitor.connect('changed', Lang.bind(this, this._loadConfig));
+            getLogger().warning("Reloading " + entries_file);
 
             if(!this._config_loader)
                 this.config_loader = new Core.ConfigLoader();
@@ -272,6 +326,16 @@ const TogglerIndicator = new Lang.Class({
             getLogger().notify("ext",
                 "An error occurs when loading entries.",
                 errorToString(e));
+        }
+    },
+
+    _loadSearchBar: function() {
+        let is_show_filter = this._settings.get_boolean(Prefs.SHOW_FILTER);
+        if(!is_show_filter) {
+            if(this.searchBox)
+                this.searchBox.destroy();
+            this.searchBox = null
+            return;
         }
 
         if(!this.searchBox) {
@@ -306,7 +370,8 @@ const TogglerIndicator = new Lang.Class({
             kbmode.NORMAL | kbmode.MESSAGE_TRAY,
             Lang.bind(this, function() {
                 this.menu.toggle();
-                this.searchBox.search.grab_key_focus();
+                if(this.searchBox)
+                    this.searchBox.search.grab_key_focus();
             }));
     },
 
@@ -314,7 +379,8 @@ const TogglerIndicator = new Lang.Class({
         this.parent(menu, open);
 
         if(open) {
-            this.searchBox.reset();
+            if(this.searchBox)
+                this.searchBox.reset();
             this._gotSearchResult([], false);
         }
     },
@@ -377,6 +443,7 @@ const TogglerIndicator = new Lang.Class({
 let indicator;
 
 function init() {
+    Convenience.initTranslations("gnome-extension-quicktoggler");
 }
 
 function enable() {

@@ -1,82 +1,90 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
 msgid ""
 msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-04-18 08:48+0800\n"
-"Last-Translator: Shihira Fung <fengzhiping@hotmail.com>\n"
-"Language: zh_CN\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: prefs.glade:33
 msgid "  Custom Entries File"
-msgstr "自定义Entries文件"
+msgstr ""
 
 #: prefs.glade:78
 msgid "Indicator Icon"
-msgstr "指示器图标"
+msgstr ""
 
 #: prefs.glade:115
-#, fuzzy
 msgid "Indicator Text"
-msgstr "指示器文本"
+msgstr ""
 
 #: prefs.glade:158
 msgid "Shortcut"
-msgstr "快捷键"
+msgstr ""
 
 #: prefs.glade:171
 msgid "Press to Edit"
-msgstr "点击右边按钮编辑"
+msgstr ""
 
 #: prefs.glade:191
 msgid "New Accerlator..."
-msgstr "新快捷键……"
+msgstr ""
 
 #: prefs.glade:220
 msgid "Detection Interval (ms)"
-msgstr "侦测间隔（ms）"
+msgstr ""
 
 #: prefs.glade:259
 msgid "Show Filter"
-msgstr "启用搜索"
+msgstr ""
 
 #: prefs.glade:296
 msgid "Logging"
-msgstr "日志"
+msgstr ""
 
 #: prefs.glade:348
 msgid "GNOME Default"
-msgstr "GNOME默认方式"
+msgstr ""
 
 #: prefs.glade:368
 msgid "Log to File"
-msgstr "记录到文件"
+msgstr ""
 
 #: prefs.glade:419
 msgid "Notification"
-msgstr "通知"
+msgstr ""
 
 #: prefs.glade:470
 msgid "Notify me when a process exited unexpectedly"
-msgstr "进程异常退出时通知我"
+msgstr ""
 
 #: prefs.glade:485
 msgid "Notify me when the extension failed to work normally"
-msgstr "扩展无法正常工作时通知我"
+msgstr ""
 
 #: prefs.glade:500
 msgid "Notify me when the state of a toggler was changed"
-msgstr "Toggler状态变化时通知我"
+msgstr ""
 
 #: prefs.glade:534
 msgid "Apply"
-msgstr "应用"
+msgstr ""
 
 #: prefs.glade:547
 msgid "Restore"
-msgstr "恢复"
+msgstr ""
 
 #: extension.js:119
 msgid "Filter"
-msgstr "搜索"
+msgstr ""

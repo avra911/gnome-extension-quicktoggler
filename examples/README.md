@@ -1,8 +1,10 @@
 # Examples
 
 Here are some examples. Put them inside `"entries": [...]` to make them work.
-Welcome for more third-party examples. Send me pull requests if you want to add
+Welcome for more third-party examples. File me pull requests if you want to add
 yours.
+
+NOTE: With `addentry.sh`, simply paste any of the following code snippet as a **custom** entry.
 
 ## Restart the Extension
 
@@ -90,4 +92,15 @@ Considerable tasks can be done by gsettings.
 }
 ```
 
+## Keep Eye on CPU Temperature
 
+You can print information you care about on the top-bar, especially real-time information, like CPU temperature, stock prices, etc.
+
+```
+{
+    "type": "tmux",
+    "title": "CPU Temperature",
+    "session": "cpu-temp",
+    "command": "while true; do gsettings --schemadir ~/.local/share/gnome-shell/extensions/quicktoggler@shihira.github.com/schemas set org.gnome.shell.extensions.quicktoggler indicator-text \"$(expr $(cat /sys/class/thermal/thermal_zone0/temp) / 1000) deg\"; sleep 2; done"
+}
+```

@@ -21,6 +21,11 @@
         <summary>Indicator Icon</summary>
         <description>Indicator icon.</description>
     </key>
+    <key type="s" name="indicator-text">
+        <default>''</default>
+        <summary>Indicator Text</summary>
+        <description>Indicator text.</description>
+    </key>
     <key type="as" name="menu-shortcut">
         <default>['&lt;Super&gt;j']</default>
         <summary>Menu Shortcut</summary>
@@ -30,6 +35,11 @@
         <default>['ext']</default>
         <summary>Notification Conditions</summary>
         <description>Array of notification conditions. Please select from 'proc', 'ext', 'state'.</description>
+    </key>
+    <key type="b" name="show-filter">
+        <default>true</default>
+        <summary>Whether to show the filter.</summary>
+        <description>Whether to show the filter.</description>
     </key>
   </schema>
 </schemalist>

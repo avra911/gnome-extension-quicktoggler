@@ -5,12 +5,22 @@ const Lang = imports.lang;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 
+/*
+ * How to add an option:
+ *
+ *  1. Add the name of widgets in loadNames, it turns abc-efg to abc_efg.
+ *  2. Use bindSchema to enable auto load settings from dconf
+ *  3. Specify a getter and a setter, which access the widgets.
+ */
+
 const ENTRIES_FILE = "entries-file";
 const DETECTION_INTERVAL = "detection-interval";
 const LOG_FILE = "log-file";
 const INDICATOR_ICON = "indicator-icon";
+const INDICATOR_TEXT = "indicator-text";
 const MENU_SHORTCUT = "menu-shortcut";
 const NOTIFICATION_COND = "notification-cond";
+const SHOW_FILTER = "show-filter";
 
 const PrefsWindow = new Lang.Class({
     Name: "PrefsWindow",
@@ -23,9 +33,11 @@ const PrefsWindow = new Lang.Class({
             "check-entries",
             "file-entries",
             "entry-indicator",
+            "entry-indicator-text",
             "btn-shortcut",
             "spin-interval",
             "switch-log",
+            "switch-show-filter",
             "radio-log-gnome",
             "radio-log-file",
             "file-log-file",
@@ -59,10 +71,12 @@ const PrefsWindow = new Lang.Class({
 
         this.bindSchema(ENTRIES_FILE, "string");
         this.bindSchema(INDICATOR_ICON, "string");
+        this.bindSchema(INDICATOR_TEXT, "string");
         this.bindSchema(MENU_SHORTCUT, "strv");
         this.bindSchema(DETECTION_INTERVAL, "int");
         this.bindSchema(LOG_FILE, "string");
         this.bindSchema(NOTIFICATION_COND, "strv");
+        this.bindSchema(SHOW_FILTER, "boolean");
 
         this.setupSettings();
         this.setupState();
@@ -162,6 +176,8 @@ const PrefsWindow = new Lang.Class({
     },
     get indicator_icon() { return this.entry_indicator.get_text(); },
     set indicator_icon(t) { this.entry_indicator.set_text(t); },
+    get indicator_text() { return this.entry_indicator_text.get_text(); },
+    set indicator_text(t) { this.entry_indicator_text.set_text(t); },
     get menu_shortcut() { return [this.btn_shortcut.get_label()]; },
     set menu_shortcut(v) { return this.btn_shortcut.set_label(v[0]); },
     get detection_interval() { return this.spin_interval.value; },
@@ -193,6 +209,12 @@ const PrefsWindow = new Lang.Class({
         this.check_notify_proc.active  = arr.indexOf("proc")  >= 0;
         this.check_notify_ext.active   = arr.indexOf("ext")   >= 0;
         this.check_notify_state.active = arr.indexOf("state") >= 0;
+    },
+    get show_filter() {
+        return this.switch_show_filter.active;
+    },
+    set show_filter(t) {
+        this.switch_show_filter.active = t;
     },
 });
 
